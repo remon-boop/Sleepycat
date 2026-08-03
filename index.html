@@ -494,7 +494,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
   <div class="ld-bar"></div>
 </div>
 <div id="ptrans"></div>
-<div id="toast" class="on">Paste a token first</div>
+<div id="toast" class="on">Countdown saved</div>
 <button id="stopb" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <nav id="nav">
@@ -583,9 +583,9 @@ textarea.adm-inp{min-height:70px;resize:vertical}
   <div class="adm-tabs">
     <button class="adm-tab" onclick="admTab('prod',this)">Products</button>
     <button class="adm-tab" onclick="admTab('hero',this)">Hero</button>
-    <button class="adm-tab" onclick="admTab('cd',this)">Countdown</button>
+    <button class="adm-tab on" onclick="admTab('cd',this)">Countdown</button>
     <button class="adm-tab" onclick="admTab('szc',this)">Size Chart</button>
-    <button class="adm-tab on" onclick="admTab('set',this)">Settings</button>
+    <button class="adm-tab" onclick="admTab('set',this)">Settings</button>
   </div>
   <div class="adm-body">
 
@@ -634,7 +634,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
       <button class="adm-btn" onclick="ahSave()">Save Hero</button>
     </div>
 
-    <div class="adm-sec" id="adm-cd">
+    <div class="adm-sec on" id="adm-cd">
       <div class="adm-f"><label>Countdown Enabled</label>
         <select class="adm-inp" id="ac-on" __gcruniqueid="20"><option value="0">Off</option><option value="1">On</option></select></div>
       <div class="adm-f"><label>Label</label><input class="adm-inp" id="ac-label" __gcruniqueid="21"></div>
@@ -648,7 +648,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
       <button class="adm-btn" onclick="aszSave()">Save Size Chart</button>
     </div>
 
-    <div class="adm-sec on" id="adm-set">
+    <div class="adm-sec" id="adm-set">
       <div class="adm-f"><label>Change Admin Passcode</label><input class="adm-inp" id="as-pass" placeholder="New passcode" __gcruniqueid="22"></div>
       <button class="adm-btn" onclick="asSave()">Save Passcode</button>
 
@@ -714,7 +714,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
     </div>
   </section>
 
-  <div class="stmt rv">
+  <div class="stmt rv in">
     <div class="stmt-inner">
       <p class="stmt-text"><span class="stmt-dim">Not For Everyone.</span><br>Built For Those Who Know.</p>
       <div class="stmt-stats">
