@@ -664,11 +664,19 @@ textarea.adm-inp{min-height:70px;resize:vertical}
     <div class="adm-sec" id="adm-set">
       <div class="adm-f"><label>Change Admin Passcode</label><input class="adm-inp" id="as-pass" placeholder="New passcode"></div>
       <button class="adm-btn" onclick="asSave()">Save Passcode</button>
-      <p class="adm-note">How publishing works: every change here updates the live preview instantly. When you're happy, press PUBLISH below — it downloads a new index.html. Upload that file to your GitHub repo (replace the old one, Commit) and the live site updates in ~1 minute.</p>
+
+      <div style="border-top:1px solid rgba(255,255,255,.1);margin:1.5rem 0 1rem"></div>
+      <div class="adm-f"><label>Auto-Publish — GitHub Token</label><input class="adm-inp" id="as-ghtoken" type="password" placeholder="Paste token (stored on this device only)"></div>
+      <button class="adm-btn" onclick="ghSaveToken()">Save Token</button>
+      <p class="adm-note" id="gh-status"></p>
+      <p class="adm-note">Save a GitHub token here once, then the green <b>PUBLISH LIVE</b> button updates your real website directly — no download or upload. The token is kept only in this browser and is <b>never</b> written into your site. Create one at GitHub → Settings → Developer settings → Fine-grained tokens, scoped to the <b>Sleepycat</b> repo with <b>Contents: Read and write</b>.</p>
     </div>
 
   </div>
-  <div class="adm-pub"><button class="adm-btn" onclick="admPublish()" style="margin:0">⬇ Publish — Download index.html</button></div>
+  <div class="adm-pub" style="display:flex;gap:.6rem;flex-wrap:wrap">
+    <button class="adm-btn" id="pub-live" onclick="admPublishLive()" style="margin:0;background:#1a7f37;color:#fff">⬆ Publish Live — Update Site</button>
+    <button class="adm-btn ghost" onclick="admPublish()" style="margin:0">⬇ Download index.html</button>
+  </div>
 </div>
 
 <!-- ═══ HOME PAGE ═══ -->
@@ -1793,20 +1801,88 @@ function refreshAll(){
     if(still)openProduct(still.id); else go('shop');
   }
 }
-function admPublish(){
+// Serialize the current site (with admin edits baked in) to a full HTML string.
+// The GitHub token lives only in JS/localStorage — clear its field so it can
+// never be serialized into the published file.
+function buildSiteHTML(){
   DATA.products=PRODUCTS;
   document.getElementById('site-data').textContent=JSON.stringify(DATA);
+  const tf=document.getElementById('as-ghtoken'); if(tf) tf.value='';
+  return '<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+}
+function admPublish(){
+  const html=buildSiteHTML();
   document.getElementById('adm').classList.remove('open');
   document.getElementById('admlogin').classList.remove('open');
   document.body.style.overflow='';
   setTimeout(()=>{
-    const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
     const blob=new Blob([html],{type:'text/html'});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob); a.download='index.html'; a.click();
     URL.revokeObjectURL(a.href);
     toast('index.html downloaded — upload it to GitHub');
-  },450);
+  },300);
+}
+
+// ═══ AUTO-PUBLISH DIRECT TO GITHUB (no download/upload) ═══
+const GH_OWNER='remon-boop', GH_REPO='Sleepycat', GH_BRANCH='main', GH_PATH='index.html';
+let GH_TOKEN=''; try{ GH_TOKEN=localStorage.getItem('owl_gh_token')||''; }catch(e){}
+function ghStatus(){
+  const el=document.getElementById('gh-status'); if(!el)return;
+  el.innerHTML = GH_TOKEN
+    ? '✅ Token saved on this device — Publish Live is ready.'
+    : '⚠ No token saved yet — add one to enable Publish Live.';
+}
+function ghSaveToken(){
+  const t=document.getElementById('as-ghtoken').value.trim();
+  if(!t){ toast('Paste a token first'); return; }
+  GH_TOKEN=t;
+  try{ localStorage.setItem('owl_gh_token',t); }catch(e){}
+  document.getElementById('as-ghtoken').value='';
+  ghStatus();
+  toast('Token saved on this device');
+}
+// UTF-8 → base64, chunked so it handles the multi-MB page safely
+function utf8ToBase64(str){
+  const bytes=new TextEncoder().encode(str); let bin=''; const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){ bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk)); }
+  return btoa(bin);
+}
+async function ghApi(url,opts={}){
+  opts.headers=Object.assign({
+    'Authorization':'Bearer '+GH_TOKEN,
+    'Accept':'application/vnd.github+json',
+    'X-GitHub-Api-Version':'2022-11-28'
+  },opts.headers||{});
+  const r=await fetch(url,opts);
+  if(!r.ok){ const j=await r.json().catch(()=>({})); throw new Error((j&&j.message)||('HTTP '+r.status)); }
+  return r.json();
+}
+async function admPublishLive(){
+  if(!GH_TOKEN){
+    toast('Add a GitHub token in Settings first');
+    admTab('set',document.querySelectorAll('.adm-tab')[4]);
+    return;
+  }
+  const btn=document.getElementById('pub-live'); const label=btn?btn.textContent:'';
+  if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
+  try{
+    const html=buildSiteHTML();
+    const base='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO;
+    // Git Data API: blob → tree → commit → move branch (handles the large file cleanly)
+    const ref=await ghApi(base+'/git/ref/heads/'+GH_BRANCH);
+    const commitSha=ref.object.sha;
+    const commit=await ghApi(base+'/git/commits/'+commitSha);
+    const blob=await ghApi(base+'/git/blobs',{method:'POST',body:JSON.stringify({content:utf8ToBase64(html),encoding:'base64'})});
+    const tree=await ghApi(base+'/git/trees',{method:'POST',body:JSON.stringify({base_tree:commit.tree.sha,tree:[{path:GH_PATH,mode:'100644',type:'blob',sha:blob.sha}]})});
+    const newCommit=await ghApi(base+'/git/commits',{method:'POST',body:JSON.stringify({message:'Update site content via admin panel',tree:tree.sha,parents:[commitSha]})});
+    await ghApi(base+'/git/refs/heads/'+GH_BRANCH,{method:'PATCH',body:JSON.stringify({sha:newCommit.sha})});
+    if(btn){ btn.disabled=false; btn.textContent=label; }
+    toast('✅ Published! Your live site updates in ~1 minute');
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent=label; }
+    toast('Publish failed: '+e.message);
+  }
 }
 
 // ═══ INIT ═══
@@ -1817,6 +1893,7 @@ renderGrids();
 renderWishPage();
 updateWishBadge();
 renderCart();
+ghStatus();
 document.getElementById('pg-home').classList.add('active');
 document.querySelector('[data-nav="home"]').classList.add('active');
 window.addEventListener('load',()=>{
