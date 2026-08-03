@@ -673,9 +673,12 @@ textarea.adm-inp{min-height:70px;resize:vertical}
     </div>
 
   </div>
-  <div class="adm-pub" style="display:flex;gap:.6rem;flex-wrap:wrap">
-    <button class="adm-btn" id="pub-live" onclick="admPublishLive()" style="margin:0;background:#1a7f37;color:#fff">⬆ Publish Live — Update Site</button>
-    <button class="adm-btn ghost" onclick="admPublish()" style="margin:0">⬇ Download index.html</button>
+  <div class="adm-pub" style="display:block">
+    <div id="pub-msg" style="font-family:'Space Mono',monospace;font-size:9.5px;line-height:1.6;margin-bottom:.7rem;display:none;padding:.6rem .7rem;border-radius:4px;background:rgba(255,255,255,.06)"></div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+      <button class="adm-btn" id="pub-live" onclick="admPublishLive()" style="margin:0;background:#1a7f37;color:#fff">⬆ Publish Live — Update Site</button>
+      <button class="adm-btn ghost" onclick="admPublish()" style="margin:0">⬇ Download index.html</button>
+    </div>
   </div>
 </div>
 
@@ -1858,14 +1861,19 @@ async function ghApi(url,opts={}){
   if(!r.ok){ const j=await r.json().catch(()=>({})); throw new Error((j&&j.message)||('HTTP '+r.status)); }
   return r.json();
 }
+function pubMsg(html,color){
+  const el=document.getElementById('pub-msg'); if(!el)return;
+  el.style.display='block'; el.style.color=color||'#fff'; el.innerHTML=html;
+}
 async function admPublishLive(){
   if(!GH_TOKEN){
-    toast('Add a GitHub token in Settings first');
+    pubMsg('⚠ No GitHub token saved yet. Open the <b>Settings</b> tab → paste your token in the <b>GitHub Token</b> box → tap <b>Save Token</b>, then come back and press this button.','#ffb84d');
     admTab('set',document.querySelectorAll('.adm-tab')[4]);
     return;
   }
   const btn=document.getElementById('pub-live'); const label=btn?btn.textContent:'';
   if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
+  pubMsg('⏳ Publishing your changes to GitHub…','#8ab4ff');
   try{
     const html=buildSiteHTML();
     const base='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO;
@@ -1878,10 +1886,10 @@ async function admPublishLive(){
     const newCommit=await ghApi(base+'/git/commits',{method:'POST',body:JSON.stringify({message:'Update site content via admin panel',tree:tree.sha,parents:[commitSha]})});
     await ghApi(base+'/git/refs/heads/'+GH_BRANCH,{method:'PATCH',body:JSON.stringify({sha:newCommit.sha})});
     if(btn){ btn.disabled=false; btn.textContent=label; }
-    toast('✅ Published! Your live site updates in ~1 minute');
+    pubMsg('✅ <b>Published!</b> Your live site updates in about 1 minute. Wait a moment, then refresh owlwear.shop to see the change.','#57d977');
   }catch(e){
     if(btn){ btn.disabled=false; btn.textContent=label; }
-    toast('Publish failed: '+e.message);
+    pubMsg('❌ <b>Publish failed:</b> '+(e.message||'unknown error')+'<br>Screenshot this and send it — usually it means the token needs <b>Contents: Read and write</b> on the <b>Sleepycat</b> repo.','#ff6b6b');
   }
 }
 
