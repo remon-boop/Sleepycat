@@ -1865,31 +1865,46 @@ function pubMsg(html,color){
   const el=document.getElementById('pub-msg'); if(!el)return;
   el.style.display='block'; el.style.color=color||'#fff'; el.innerHTML=html;
 }
+// One publish attempt: blob → tree → commit → move branch. Reads the current
+// branch tip fresh each call so a retry rebases onto whatever landed meanwhile.
+async function ghCommitOnce(base,html){
+  const ref=await ghApi(base+'/git/ref/heads/'+GH_BRANCH);
+  const commitSha=ref.object.sha;
+  const commit=await ghApi(base+'/git/commits/'+commitSha);
+  const blob=await ghApi(base+'/git/blobs',{method:'POST',body:JSON.stringify({content:utf8ToBase64(html),encoding:'base64'})});
+  const tree=await ghApi(base+'/git/trees',{method:'POST',body:JSON.stringify({base_tree:commit.tree.sha,tree:[{path:GH_PATH,mode:'100644',type:'blob',sha:blob.sha}]})});
+  const newCommit=await ghApi(base+'/git/commits',{method:'POST',body:JSON.stringify({message:'Update site content via admin panel',tree:tree.sha,parents:[commitSha]})});
+  await ghApi(base+'/git/refs/heads/'+GH_BRANCH,{method:'PATCH',body:JSON.stringify({sha:newCommit.sha})});
+}
+let PUBLISHING=false;
 async function admPublishLive(){
   if(!GH_TOKEN){
     pubMsg('⚠ No GitHub token saved yet. Open the <b>Settings</b> tab → paste your token in the <b>GitHub Token</b> box → tap <b>Save Token</b>, then come back and press this button.','#ffb84d');
     admTab('set',document.querySelectorAll('.adm-tab')[4]);
     return;
   }
+  if(PUBLISHING){ return; }               // ignore double-taps
+  PUBLISHING=true;
   const btn=document.getElementById('pub-live'); const label=btn?btn.textContent:'';
   if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
   pubMsg('⏳ Publishing your changes to GitHub…','#8ab4ff');
-  try{
-    const html=buildSiteHTML();
-    const base='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO;
-    // Git Data API: blob → tree → commit → move branch (handles the large file cleanly)
-    const ref=await ghApi(base+'/git/ref/heads/'+GH_BRANCH);
-    const commitSha=ref.object.sha;
-    const commit=await ghApi(base+'/git/commits/'+commitSha);
-    const blob=await ghApi(base+'/git/blobs',{method:'POST',body:JSON.stringify({content:utf8ToBase64(html),encoding:'base64'})});
-    const tree=await ghApi(base+'/git/trees',{method:'POST',body:JSON.stringify({base_tree:commit.tree.sha,tree:[{path:GH_PATH,mode:'100644',type:'blob',sha:blob.sha}]})});
-    const newCommit=await ghApi(base+'/git/commits',{method:'POST',body:JSON.stringify({message:'Update site content via admin panel',tree:tree.sha,parents:[commitSha]})});
-    await ghApi(base+'/git/refs/heads/'+GH_BRANCH,{method:'PATCH',body:JSON.stringify({sha:newCommit.sha})});
-    if(btn){ btn.disabled=false; btn.textContent=label; }
+  const base='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO;
+  const html=buildSiteHTML();
+  let done=false, lastErr;
+  for(let attempt=0; attempt<4 && !done; attempt++){
+    try{ await ghCommitOnce(base,html); done=true; }
+    catch(e){
+      lastErr=e;
+      if(/fast.?forward/i.test(e.message||'')){ pubMsg('⏳ Another change landed — retrying…','#8ab4ff'); continue; }
+      break; // non-retryable error
+    }
+  }
+  if(btn){ btn.disabled=false; btn.textContent=label; }
+  PUBLISHING=false;
+  if(done){
     pubMsg('✅ <b>Published!</b> Your live site updates in about 1 minute. Wait a moment, then refresh owlwear.shop to see the change.','#57d977');
-  }catch(e){
-    if(btn){ btn.disabled=false; btn.textContent=label; }
-    pubMsg('❌ <b>Publish failed:</b> '+(e.message||'unknown error')+'<br>Screenshot this and send it — usually it means the token needs <b>Contents: Read and write</b> on the <b>Sleepycat</b> repo.','#ff6b6b');
+  }else{
+    pubMsg('❌ <b>Publish failed:</b> '+((lastErr&&lastErr.message)||'unknown error')+'<br>Screenshot this and send it — if it mentions permissions, the token needs <b>Contents: Read and write</b> on the <b>Sleepycat</b> repo.','#ff6b6b');
   }
 }
 
