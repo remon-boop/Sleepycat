@@ -33,7 +33,7 @@ This repo is set up to be served by GitHub Pages:
 1. Go to **Settings → Pages**.
 2. Under **Build and deployment → Source**, choose **Deploy from a branch**.
 3. Select the branch this file lives on and the `/ (root)` folder, then **Save**.
-4. After a minute, your site is live at `https://<user>.github.io/<repo>/`.
+4. After a minute, your site is live at `https://remon-boop.github.io/<repo>/`.
 
 ## Custom domain (Hostinger)
 
@@ -54,7 +54,7 @@ your Hostinger domain at GitHub Pages, add these DNS records in Hostinger
 
 | Type  | Name | Points to               |
 |-------|------|-------------------------|
-| CNAME | www  | `<user>.github.io`      |
+| CNAME | www  | `remon-boop.github.io`      |
 
 Then in **GitHub → Settings → Pages → Custom domain**, enter your domain, save,
 and tick **Enforce HTTPS** once the certificate is issued (can take up to an
