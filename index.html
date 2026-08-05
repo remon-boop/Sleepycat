@@ -1205,7 +1205,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
   <div class="ct-wrap">
     <div class="ct-l">
       <h1 class="ct-title">Get In<br><span class="out">Touch</span></h1>
-      <div class="ct-item"><p class="ct-item-l">Email</p><a class="ct-item-v" href="mailto:afnanulstudio@gmail.com">afnanulstudio@gmail.com</a></div>
+      <div class="ct-item"><p class="ct-item-l">Email</p><a class="ct-item-v" href="mailto:afnanulstudio08@gmail.com">afnanulstudio08@gmail.com</a></div>
       <div class="ct-item"><p class="ct-item-l">Phone / WhatsApp</p><a class="ct-item-v" href="https://wa.me/8801410053188" target="_blank" rel="noopener">+880 1410-053188</a></div>
       <div class="ct-item"><p class="ct-item-l">Based In</p><p class="ct-item-v">Dhaka, Bangladesh</p></div>
       <div class="ct-item"><p class="ct-item-l">Hours</p><p class="ct-item-v">Sat–Thu, 10AM – 8PM</p></div>
@@ -1896,7 +1896,7 @@ async function sendContact(){
   if(!n||!e||!e.includes('@')||!m){toast('Please fill in name, email & message');return;}
   toast('Sending…');
   try{
-    const r=await fetch('https://formsubmit.co/ajax/afnanulstudio@gmail.com',{
+    const r=await fetch('https://formsubmit.co/ajax/afnanulstudio08@gmail.com',{
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify({name:n,email:e,message:m,_subject:'New message from owlwear.shop',_template:'table'})
@@ -1904,8 +1904,8 @@ async function sendContact(){
     if(r.ok){
       document.getElementById('ct-name').value='';document.getElementById('ct-email').value='';document.getElementById('ct-msg').value='';
       toast('Message sent — we reply within 24h');
-    }else{ toast('Could not send — email us at afnanulstudio@gmail.com'); }
-  }catch(err){ toast('Could not send — email us at afnanulstudio@gmail.com'); }
+    }else{ toast('Could not send — email us at afnanulstudio08@gmail.com'); }
+  }catch(err){ toast('Could not send — email us at afnanulstudio08@gmail.com'); }
 }
 
 // ═══ TOAST / SCROLL / REVEAL ═══
