@@ -387,7 +387,7 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:3.5rem 2.5vw 2rem;disp
 .sr-price{font-family:'Barlow Condensed',sans-serif;font-size:15px;color:rgba(255,255,255,.5)}
 
 /* IMAGE ZOOM */
-.pd-main-img img{cursor:zoom-in;transition:transform .25s ease}
+.pd-main-img img{cursor:zoom-in;transition:transform .25s ease,opacity .3s ease}
 .pd-main-img.zoomed img{cursor:zoom-out}
 
 /* REVIEWS */
@@ -1497,6 +1497,7 @@ let RECENT = ld('ow_recent')||[];
 // ═══ ROUTER ═══
 let currentPage='home', currentProduct=null;
 function go(page){
+  if(page!=='product') stopPdSlide();
   const pt=document.getElementById('ptrans');
   pt.classList.remove('go'); void pt.offsetWidth; pt.classList.add('go');
   setTimeout(()=>{
@@ -1564,9 +1565,9 @@ function openProduct(id){
   currentProduct=p;
   pdSize=null; pdColor=p.colors[0].name;
 
-  document.getElementById('pd-img').src=IMG[p.imgs[0]];
   document.getElementById('pd-thumbs').innerHTML=p.imgs.map((k,i)=>
-    `<div class="pd-thumb${i===0?' on':''}" onclick="pdThumb(this,'${k}')"><img src="${IMG[k]}" alt=""></div>`).join('');
+    `<div class="pd-thumb${i===0?' on':''}" onclick="pdThumb(${i})"><img src="${IMG[k]}" alt=""></div>`).join('');
+  startPdSlide(p.imgs);
   document.getElementById('pd-bread-name').textContent=p.name;
   document.getElementById('pd-name').textContent=p.name;
   document.getElementById('pd-price').innerHTML=p.op?`<s>৳${p.op.toLocaleString()}</s>৳${p.price.toLocaleString()}`:`৳${p.price.toLocaleString()}`;
@@ -1597,10 +1598,26 @@ function openProduct(id){
 
   go('product');
 }
-function pdThumb(el,key){
-  document.querySelectorAll('.pd-thumb').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('pd-img').src=IMG[key];
+let pdSlideInt=null, pdSlideIdx=0, pdSlideImgs=[];
+function pdShow(i){
+  if(!pdSlideImgs.length)return;
+  pdSlideIdx=(i+pdSlideImgs.length)%pdSlideImgs.length;
+  const img=document.getElementById('pd-img'); if(!img)return;
+  img.style.opacity='0';
+  setTimeout(()=>{img.src=IMG[pdSlideImgs[pdSlideIdx]]; img.style.opacity='1';},240);
+  document.querySelectorAll('.pd-thumb').forEach((t,j)=>t.classList.toggle('on',j===pdSlideIdx));
+}
+function startPdSlide(imgs){
+  pdSlideImgs=imgs.slice(); pdSlideIdx=0;
+  clearInterval(pdSlideInt); pdSlideInt=null;
+  const img=document.getElementById('pd-img'); if(img){img.style.opacity='1'; img.src=IMG[imgs[0]];}
+  if(imgs.length>1) pdSlideInt=setInterval(()=>pdShow(pdSlideIdx+1),3500);
+}
+function stopPdSlide(){ clearInterval(pdSlideInt); pdSlideInt=null; }
+function pdThumb(i){
+  pdShow(i);
+  clearInterval(pdSlideInt); pdSlideInt=null;
+  if(pdSlideImgs.length>1) pdSlideInt=setInterval(()=>pdShow(pdSlideIdx+1),3500);
 }
 function pdSelSize(btn){
   document.querySelectorAll('#pd-sizes .szbtn').forEach(b=>b.classList.remove('on'));
