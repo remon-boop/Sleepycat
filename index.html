@@ -77,7 +77,7 @@ input,select{font-family:'Barlow',sans-serif}
 .btn-ghost:hover{background:#fff;color:#000;border-color:#fff}
 
 /* HERO (home) */
-#hero{position:relative;display:block;background:#0a0a0a;line-height:0}.hero-vid{position:relative;width:100%}.hero-box{position:absolute;cursor:pointer;z-index:2;border-radius:12px}.hero-box:hover{background:rgba(255,255,255,.06)}
+#hero{position:relative;display:block;background:#0a0a0a;line-height:0;overflow:hidden}.hero-vid{position:relative;width:100%}.hero-box{position:absolute;cursor:pointer;z-index:2;border-radius:12px}.hero-box:hover{background:rgba(255,255,255,.06)}
 .hpanel{position:relative;overflow:hidden}
 .hpanel img{transform:scale(1.04);transition:transform 9s ease}
 .hpanel:hover img{transform:scale(1)}
@@ -104,6 +104,13 @@ input,select{font-family:'Barlow',sans-serif}
 .pcard[data-hidden="true"]{display:none}
 .pimg{aspect-ratio:3/4;overflow:hidden;position:relative}
 .pimg img{transition:transform .7s cubic-bezier(.25,.46,.45,.94)}
+.pimg-alt{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
+.pcard:hover .pimg-alt{opacity:1}
+@keyframes cardIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.pgrid .pcard{animation:cardIn .6s cubic-bezier(.16,1,.3,1) both}
+.pgrid .pcard:nth-child(1){animation-delay:.02s}.pgrid .pcard:nth-child(2){animation-delay:.09s}
+.pgrid .pcard:nth-child(3){animation-delay:.16s}.pgrid .pcard:nth-child(4){animation-delay:.23s}
+.pgrid .pcard:nth-child(n+5){animation-delay:.28s}
 .pcard:hover .pimg img{transform:scale(1.06)}
 .pov{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;transition:opacity .3s;display:flex;align-items:center;justify-content:center}
 .pcard:hover .pov{opacity:1}
@@ -280,8 +287,9 @@ textarea.ct-inp{min-height:130px;resize:vertical}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 #stopb{position:fixed;bottom:2rem;right:2rem;width:42px;height:42px;background:#fff;color:#000;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;transition:all .3s;transform:translateY(8px)}
 #stopb.on{opacity:1;transform:translateY(0)}
-.rv{opacity:0;transform:translateY(24px);transition:opacity .75s ease,transform .75s ease}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
 .rv.in{opacity:1;transform:translateY(0)}
+.par{will-change:transform}
 
 /* LOOKBOOK/CAMPAIGN/NEWSLETTER/FOOTER */
 #campaignSec{position:relative;height:76vh;min-height:440px;overflow:hidden;margin:1px 0}
@@ -761,7 +769,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
   </div>
 
     <section id="hero">
-    <div class="hero-vid">
+    <div class="hero-vid par" data-par="-0.09">
       <video id="hero-vid" autoplay muted loop playsinline preload="auto" poster="hero_poster.jpg" style="width:100%;height:auto;display:block;pointer-events:none">
         <source src="hero.mp4" type="video/mp4">
       </video>
@@ -1515,7 +1523,7 @@ function cardHTML(p){
   const priceHTML = p.op ? `<s>৳${p.op.toLocaleString()}</s>৳${p.price.toLocaleString()}` : `৳${p.price.toLocaleString()}`;
   const badgeHTML = p.badge ? `<span class="pbadge">${p.badge}</span>` : '';
   return `<div class="pcard" data-type="${p.type}" onclick="openProduct('${p.id}')">
-    <div class="pimg"><img src="${IMG[p.imgs[0]]}" alt="${p.name}">
+    <div class="pimg"><img src="${IMG[p.imgs[0]]}" alt="${p.name}">${p.imgs[1]?`<img class="pimg-alt" src="${IMG[p.imgs[1]]}" alt="">`:''}
       <div class="pov"><button class="qvbtn">View Product</button></div>
       ${badgeHTML}
       <button class="pwish${WISH.has(p.id)?' on':''}" onclick="toggleWish(event,this,'${p.id}')">${WISH.has(p.id)?'♥':'♡'}</button>
@@ -1912,8 +1920,13 @@ async function sendContact(){
 let tt;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600);}
 window.addEventListener('scroll',()=>{document.getElementById('stopb').classList.toggle('on',window.scrollY>500)});
-const ro=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');ro.unobserve(x.target)}}),{threshold:.1});
-document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+var ro=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');ro.unobserve(x.target)}}),{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+['.sec-h','.sec-label','.stmt-text','.lbook','.ct-title'].forEach(function(sel){document.querySelectorAll(sel).forEach(function(el){el.classList.add('rv');});});
+document.querySelectorAll('.rv:not(.in)').forEach(function(el){ro.observe(el);});
+var parTick=false;
+function parScroll(){var y=window.scrollY;document.querySelectorAll('.par').forEach(function(el){var sp=parseFloat(el.dataset.par||'0.1');el.style.transform='translate3d(0,'+(y*sp).toFixed(1)+'px,0)';});parTick=false;}
+window.addEventListener('scroll',function(){if(!parTick){requestAnimationFrame(parScroll);parTick=true;}},{passive:true});
+var _sc=document.getElementById('shop-count');if(_sc&&window.PRODUCTS)_sc.textContent=PRODUCTS.length+' Pieces — SS 2026';
 
 
 // ═══ SITE DATA LAYER ═══
