@@ -544,11 +544,71 @@ textarea.adm-inp{min-height:70px;resize:vertical}
   <div class="cftr" id="cftr" style="display:none">
     <div class="csub"><span class="cslbl">Total</span><span class="csprice" id="ctotal">৳0</span></div>
     <p class="cnote">Free shipping over ৳5,000 · 30-day returns</p>
-    <button class="cco" onclick="toast('Checkout coming in the full build!')">Checkout →</button>
+    <button class="cco" onclick="openCheckout()">Checkout →</button>
     <button class="ccnt" onclick="closeCart()">Continue Shopping</button>
   </div>
 </div>
 
+<style>
+#chk{position:fixed;inset:0;z-index:720;display:none;align-items:center;justify-content:center;padding:1rem}
+#chk.open{display:flex}
+#chk .chk-bg{position:absolute;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px)}
+.chk-box{position:relative;z-index:1;background:#0b0b0b;border:1px solid rgba(255,255,255,.12);width:100%;max-width:460px;max-height:92vh;overflow-y:auto;padding:1.6rem 1.5rem}
+.chk-x{position:absolute;top:.8rem;right:1rem;background:transparent;color:#fff;font-size:20px}
+.chk-h{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;text-transform:uppercase;margin-bottom:1.1rem}
+.chk-summary{background:rgba(255,255,255,.04);padding:.9rem 1rem;margin-bottom:1.2rem;font-size:12.5px;line-height:1.7}
+.chk-sum-row{display:flex;justify-content:space-between;gap:1rem}
+.chk-sum-tot{display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.12);margin-top:.6rem;padding-top:.6rem;font-weight:700;font-size:14px}
+.chk-field{margin-bottom:.8rem}
+.chk-field label{display:block;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.35rem}
+.chk-inp{width:100%;background:#000;border:1px solid rgba(255,255,255,.18);color:#fff;padding:.7rem .8rem;font-size:14px;border-radius:2px;font-family:'Barlow',sans-serif}
+.chk-inp:focus{border-color:#fff;outline:none}
+.chk-lbl{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin:1rem 0 .5rem}
+.chk-pays{display:flex;gap:.6rem;margin-bottom:1rem}
+.chk-pay{flex:1;background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;padding:.8rem;font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:.05em;text-transform:uppercase;font-size:13px}
+.chk-pay.on{background:#fff;color:#000;border-color:#fff}
+.chk-bkash{display:none;background:rgba(226,25,109,.08);border:1px solid rgba(226,25,109,.35);padding:1rem;margin-bottom:1rem}
+.chk-bkash.show{display:block}
+.chk-bk-note{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:.3rem}
+.chk-bk-num{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;letter-spacing:.04em;margin-bottom:.5rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.chk-copy{background:#e2196d;color:#fff;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .6rem;border-radius:2px;font-family:'Space Mono',monospace}
+.chk-bk-hint{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:.8rem}
+.chk-submit{width:100%;background:#25D366;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:15px;padding:.95rem;margin-top:.4rem;border-radius:2px}
+.chk-foot{font-size:10px;color:rgba(255,255,255,.35);text-align:center;margin-top:.7rem;line-height:1.5}
+</style>
+<div id="chk">
+  <div class="chk-bg" onclick="closeCheckout()"></div>
+  <div class="chk-box">
+    <button class="chk-x" onclick="closeCheckout()">&#10005;</button>
+    <p class="sec-label" style="margin-bottom:.3rem">Checkout</p>
+    <h2 class="chk-h">Complete Your Order</h2>
+    <div class="chk-summary" id="chk-summary"></div>
+    <div class="chk-field"><label>Full Name *</label><input id="chk-name" class="chk-inp" placeholder="Your name"></div>
+    <div class="chk-field"><label>Phone Number *</label><input id="chk-phone" class="chk-inp" type="tel" placeholder="01XXXXXXXXX"></div>
+    <div class="chk-field"><label>Full Delivery Address *</label><textarea id="chk-addr" class="chk-inp" rows="2" placeholder="House, road, area, city"></textarea></div>
+    <div class="chk-field"><label>Delivery Area</label>
+      <select id="chk-area" class="chk-inp" onchange="renderCheckout()">
+        <option value="dhaka">Inside Dhaka (&#2547;60)</option>
+        <option value="outside">Outside Dhaka (&#2547;120)</option>
+      </select>
+    </div>
+    <p class="chk-lbl">Payment Method</p>
+    <div class="chk-pays">
+      <button class="chk-pay on" id="pay-bkash" onclick="chkPay('bkash')">bKash</button>
+      <button class="chk-pay" id="pay-cod" onclick="chkPay('cod')">Cash on Delivery</button>
+    </div>
+    <div id="chk-bkash" class="chk-bkash show">
+      <p class="chk-bk-note">Send Money via <b>bKash (Personal)</b> to:</p>
+      <p class="chk-bk-num">01789053188 <button type="button" class="chk-copy" onclick="copyNum()">Copy</button></p>
+      <p class="chk-bk-hint">Pay the <b>Total</b> shown above, then enter your payment details:</p>
+      <div class="chk-field"><label>Your bKash Number *</label><input id="chk-bk-sender" class="chk-inp" type="tel" placeholder="01XXXXXXXXX"></div>
+      <div class="chk-field"><label>Transaction ID (TrxID) *</label><input id="chk-bk-txn" class="chk-inp" placeholder="e.g. 9AB1CD2EF3"></div>
+      <div class="chk-field"><label>Amount Sent (&#2547;) *</label><input id="chk-bk-amt" class="chk-inp" type="number" placeholder="Amount you paid"></div>
+    </div>
+    <button class="chk-submit" onclick="placeOrder()">Place Order via WhatsApp</button>
+    <p class="chk-foot">Your order opens in WhatsApp &mdash; just press send to confirm with us.</p>
+  </div>
+</div>
 <div id="smod">
   <div class="sbg" onclick="closeSMod()"></div>
   <div class="sbox">
@@ -988,7 +1048,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
       <div class="colrow" id="pd-colors"></div>
 
       <button class="pd-add" onclick="addFromPD()"><span id="pd-add-txt">Add to Bag</span></button>
-      <button class="pd-buy" onclick="toast('Checkout coming in the full build!')">Buy It Now</button>
+      <button class="pd-buy" onclick="buyNow()">Buy It Now</button>
 
       <p class="pd-desc" id="pd-desc"></p>
 
@@ -1587,6 +1647,70 @@ function addFromPD(){
   setTimeout(()=>{document.getElementById('pd-add-txt').textContent='Add to Bag'},1600);
 }
 
+// ═══ CHECKOUT (bKash + COD -> WhatsApp) ═══
+const OWL_BKASH='01789053188';
+const OWL_WA='8801789053188'; // WhatsApp Business number (order routing)
+let chkMethod='bkash';
+function buyNow(){
+  if(!currentProduct)return;
+  if(!pdSize){toast('Please select a size first');return;}
+  addFromPD();
+  openCheckout();
+}
+function openCheckout(){
+  if(!cart.length){toast('Your bag is empty');return;}
+  chkPay('bkash');
+  renderCheckout();
+  document.getElementById('cdrw').classList.remove('open');
+  document.getElementById('colv').classList.remove('open');
+  document.getElementById('chk').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeCheckout(){document.getElementById('chk').classList.remove('open');document.body.style.overflow='';}
+function chkShipping(sub){ if(sub>=5000)return 0; return document.getElementById('chk-area').value==='outside'?120:60; }
+function renderCheckout(){
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const ship=chkShipping(sub); const tot=sub+ship;
+  let html=cart.map(i=>`<div class="chk-sum-row"><span>${i.name} (${i.color}, ${i.size}) &times; ${i.qty}</span><span>&#2547;${(i.price*i.qty).toLocaleString()}</span></div>`).join('');
+  html+=`<div class="chk-sum-row" style="margin-top:.5rem;color:rgba(255,255,255,.6)"><span>Subtotal</span><span>&#2547;${sub.toLocaleString()}</span></div>`;
+  html+=`<div class="chk-sum-row" style="color:rgba(255,255,255,.6)"><span>Delivery</span><span>${ship?('&#2547;'+ship):'FREE'}</span></div>`;
+  html+=`<div class="chk-sum-tot"><span>Total</span><span>&#2547;${tot.toLocaleString()}</span></div>`;
+  document.getElementById('chk-summary').innerHTML=html;
+}
+function chkPay(m){
+  chkMethod=m;
+  document.getElementById('pay-bkash').classList.toggle('on',m==='bkash');
+  document.getElementById('pay-cod').classList.toggle('on',m==='cod');
+  document.getElementById('chk-bkash').classList.toggle('show',m==='bkash');
+}
+function copyNum(){try{navigator.clipboard.writeText(OWL_BKASH);toast('bKash number copied');}catch(e){toast('Number: '+OWL_BKASH);}}
+function placeOrder(){
+  if(!cart.length){toast('Your bag is empty');return;}
+  const name=document.getElementById('chk-name').value.trim();
+  const phone=document.getElementById('chk-phone').value.trim();
+  const addr=document.getElementById('chk-addr').value.trim();
+  if(!name||!phone||!addr){toast('Please fill name, phone and address');return;}
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const ship=chkShipping(sub); const tot=sub+ship;
+  const area=document.getElementById('chk-area').value==='outside'?'Outside Dhaka':'Inside Dhaka';
+  let msg='\u{1F989} *OWL WEAR — New Order*\n\n*Items:*\n';
+  cart.forEach(i=>{ msg+='• '+i.name+' ('+i.color+', '+i.size+') x '+i.qty+' — ৳'+(i.price*i.qty).toLocaleString()+'\n'; });
+  msg+='\nSubtotal: ৳'+sub.toLocaleString()+'\nDelivery ('+area+'): '+(ship?('৳'+ship):'FREE')+'\n*Total: ৳'+tot.toLocaleString()+'*\n\n';
+  msg+='*Customer:*\nName: '+name+'\nPhone: '+phone+'\nAddress: '+addr+'\n\n';
+  if(chkMethod==='bkash'){
+    const snd=document.getElementById('chk-bk-sender').value.trim();
+    const txn=document.getElementById('chk-bk-txn').value.trim();
+    const amt=document.getElementById('chk-bk-amt').value.trim();
+    if(!snd||!txn||!amt){toast('Enter your bKash number, TrxID and amount');return;}
+    msg+='*Payment: bKash (Send Money)*\nSent to: '+OWL_BKASH+'\nSender: '+snd+'\nTrxID: '+txn+'\nAmount paid: ৳'+amt;
+  }else{
+    msg+='*Payment: Cash on Delivery*\n\n*Product details:*\n';
+    cart.forEach(i=>{ const p=PRODUCTS.find(x=>x.name===i.name); msg+='• '+i.name+' ('+i.color+', '+i.size+')'+((p&&p.desc)?(' — '+p.desc):'')+'\n'; });
+  }
+  window.open('https://wa.me/'+OWL_WA+'?text='+encodeURIComponent(msg),'_blank');
+  toast('Opening WhatsApp…');
+}
+
 // ═══ WISHLIST ═══
 function toggleWish(e,btn,id){
   e.stopPropagation();
@@ -1935,7 +2059,7 @@ function buildSiteHTML(){
   DATA.products=PRODUCTS;
   const root=document.documentElement.cloneNode(true);
   const sd=root.querySelector('#site-data'); if(sd) sd.textContent=JSON.stringify(DATA);
-  ['adm','admlogin','cdrw','colv','mmenu','smod','srch'].forEach(id=>{const e=root.querySelector('#'+id); if(e)e.classList.remove('open');});
+  ['adm','admlogin','cdrw','colv','mmenu','smod','srch','chk'].forEach(id=>{const e=root.querySelector('#'+id); if(e)e.classList.remove('open');});
   ['adm-fab','szf-result'].forEach(id=>{const e=root.querySelector('#'+id); if(e)e.classList.remove('show');});
   root.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const home=root.querySelector('#pg-home'); if(home)home.classList.add('active');
