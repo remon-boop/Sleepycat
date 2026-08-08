@@ -1,0 +1,147 @@
+{
+  "hero": {
+    "eyebrow": "New Collection — SS 2026 — Bangladesh",
+    "line1": "Wear The",
+    "line2": "Night's",
+    "line3": "Wisdom",
+    "sub": "Premium streetwear<br>for those who move<br>with intention",
+    "cta": "Shop Collection →",
+    "image": "hero",
+    "video": ""
+  },
+  "countdown": {
+    "enabled": true,
+    "label": "Next Drop In",
+    "target": "2026-08-01T20:00"
+  },
+  "products": [
+    {
+      "id": "lightning-hoodie",
+      "name": "Night Spine Hoodie",
+      "cat": "Hoodie",
+      "type": "hoodie",
+      "price": 999,
+      "op": 1300,
+      "badge": "Best Seller",
+      "imgs": [
+        "hb",
+        "hw",
+        "duo"
+      ],
+      "colors": [
+        {
+          "hex": "#000",
+          "name": "Black"
+        },
+        {
+          "hex": "#ffffff",
+          "name": "White"
+        }
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "desc": "Our signature heavyweight hoodie — oversized dropped-shoulder fit, kangaroo pocket and a double-lined hood. Available in Black and White.",
+      "fabric": "380gsm heavyweight cotton fleece, brushed interior. Machine wash cold, inside out. Hang dry to preserve the print."
+    },
+    {
+      "id": "katakana-black",
+      "name": "Shadow Ninja Tee",
+      "cat": "T-Shirt",
+      "type": "tee",
+      "price": 399,
+      "op": 500,
+      "badge": "Sale",
+      "imgs": [
+        "tb1",
+        "tw1",
+        "tb2"
+      ],
+      "colors": [
+        {
+          "hex": "#000",
+          "name": "Black"
+        },
+        {
+          "hex": "#ffffff",
+          "name": "White"
+        }
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "desc": "Oversized unisex tee with a boxy dropped-shoulder fit and a reinforced collar that keeps its shape. Available in Black and White.",
+      "fabric": "240gsm premium combed cotton. Pre-shrunk. Machine wash cold, inside out. Soft water-based print that won't crack."
+    },
+    {
+      "id": "box-fit-tee",
+      "name": "Box Fit T-Shirt",
+      "cat": "T-Shirt",
+      "type": "tee",
+      "price": 450,
+      "op": null,
+      "badge": "New Drop",
+      "imgs": [
+        "bf1",
+        "bf2",
+        "bf3",
+        "bf4"
+      ],
+      "colors": [
+        {
+          "hex": "#8cb8d9",
+          "name": "Sky Blue"
+        },
+        {
+          "hex": "#000000",
+          "name": "Black"
+        }
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "desc": "Boxy oversized fit in premium mesh fabric — breathable, structured and built for everyday movement. Available in Sky Blue and Black.",
+      "fabric": "Premium mesh fabric — lightweight and breathable. Machine wash cold, inside out. Hang dry."
+    },
+    {
+      "id": "wide-leg-trouser",
+      "name": "Pleated Pant",
+      "cat": "Pant",
+      "type": "pant",
+      "price": 1600,
+      "op": null,
+      "badge": "New",
+      "imgs": [
+        "wlt1",
+        "wlt2",
+        "wlt3",
+        "wlt4"
+      ],
+      "colors": [
+        {
+          "hex": "#c4a57b",
+          "name": "Khaki"
+        },
+        {
+          "hex": "#000000",
+          "name": "Black"
+        }
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "desc": "Pleated wide-leg trouser with a clean drape and relaxed, elongating silhouette. A smart-casual staple that pairs with tees and knits alike. Available in Khaki and Black.",
+      "fabric": "Premium wrinkle-resistant suiting fabric with a soft drape. Machine wash cold or dry clean. Warm iron if needed."
+    }
+  ]
+}

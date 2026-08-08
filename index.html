@@ -1927,14 +1927,17 @@ document.querySelectorAll('.rv:not(.in)').forEach(function(el){ro.observe(el);})
 var parTick=false;
 function parScroll(){var y=window.scrollY;document.querySelectorAll('.par').forEach(function(el){var sp=parseFloat(el.dataset.par||'0.1');el.style.transform='translate3d(0,'+(y*sp).toFixed(1)+'px,0)';});parTick=false;}
 window.addEventListener('scroll',function(){if(!parTick){requestAnimationFrame(parScroll);parTick=true;}},{passive:true});
-var _sc=document.getElementById('shop-count');if(_sc&&window.PRODUCTS)_sc.textContent=PRODUCTS.length+' Pieces — SS 2026';
+var _sc=document.getElementById('shop-count');if(_sc&&typeof PRODUCTS!=='undefined')_sc.textContent=PRODUCTS.length+' Pieces — SS 2026';
 
 
 // ═══ SITE DATA LAYER ═══
 let DATA = {};
-try{ DATA = JSON.parse(document.getElementById('site-data').textContent); }catch(e){ DATA = {}; }
-DATA.hero = DATA.hero||{}; DATA.countdown = DATA.countdown||{}; DATA.sizeChart = DATA.sizeChart||[];
-if(Array.isArray(DATA.products) && DATA.products.length) PRODUCTS = DATA.products;
+function applyData(d){
+  DATA = d||{};
+  DATA.hero = DATA.hero||{}; DATA.countdown = DATA.countdown||{}; DATA.sizeChart = DATA.sizeChart||[];
+  if(Array.isArray(DATA.products) && DATA.products.length) PRODUCTS = DATA.products;
+}
+try{ applyData(JSON.parse(document.getElementById('site-data').textContent)); }catch(e){ applyData({}); }
 
 function resolveImg(x){ return IMG[x] || x; }
 
@@ -2201,12 +2204,13 @@ function pubMsg(html,color){
 }
 // One publish attempt: blob → tree → commit → move branch. Reads the current
 // branch tip fresh each call so a retry rebases onto whatever landed meanwhile.
-async function ghCommitOnce(base,html){
+async function ghCommitOnce(base,html,path){
+  path=path||GH_PATH;
   const ref=await ghApi(base+'/git/ref/heads/'+GH_BRANCH);
   const commitSha=ref.object.sha;
   const commit=await ghApi(base+'/git/commits/'+commitSha);
   const blob=await ghApi(base+'/git/blobs',{method:'POST',body:JSON.stringify({content:utf8ToBase64(html),encoding:'base64'})});
-  const tree=await ghApi(base+'/git/trees',{method:'POST',body:JSON.stringify({base_tree:commit.tree.sha,tree:[{path:GH_PATH,mode:'100644',type:'blob',sha:blob.sha}]})});
+  const tree=await ghApi(base+'/git/trees',{method:'POST',body:JSON.stringify({base_tree:commit.tree.sha,tree:[{path:path,mode:'100644',type:'blob',sha:blob.sha}]})});
   const newCommit=await ghApi(base+'/git/commits',{method:'POST',body:JSON.stringify({message:'Update site content via admin panel',tree:tree.sha,parents:[commitSha]})});
   await ghApi(base+'/git/refs/heads/'+GH_BRANCH,{method:'PATCH',body:JSON.stringify({sha:newCommit.sha})});
 }
@@ -2223,10 +2227,11 @@ async function admPublishLive(){
   if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
   pubMsg('⏳ Publishing your changes to GitHub…','#8ab4ff');
   const base='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO;
-  const html=buildSiteHTML();
+  DATA.products=PRODUCTS;
+  const html=JSON.stringify({hero:DATA.hero,countdown:DATA.countdown,products:PRODUCTS},null,2);
   let done=false, lastErr;
   for(let attempt=0; attempt<4 && !done; attempt++){
-    try{ await ghCommitOnce(base,html); done=true; }
+    try{ await ghCommitOnce(base,html,'content/data.json'); done=true; }
     catch(e){
       lastErr=e;
       if(/fast.?forward/i.test(e.message||'')){ pubMsg('⏳ Another change landed — retrying…','#8ab4ff'); continue; }
@@ -2254,6 +2259,14 @@ ghStatus();
 var _nd=document.getElementById('ndrop-img');if(_nd)_nd.src=IMG['nddrop'];
 document.getElementById('pg-home').classList.add('active');
 document.querySelector('[data-nav="home"]').classList.add('active');
+fetch('content/data.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
+  if(!d)return;
+  if(d.hero)DATA.hero=Object.assign({},DATA.hero,d.hero);
+  if(d.countdown)DATA.countdown=d.countdown;
+  if(Array.isArray(d.products)&&d.products.length){DATA.products=d.products;PRODUCTS=d.products;}
+  applyHero();applyCountdown();renderGrids();
+  var _nd2=document.getElementById('ndrop-img');if(_nd2)_nd2.src=(IMG['nddrop']||'');
+}).catch(function(){});
 window.addEventListener('load',()=>{
   setTimeout(()=>{document.getElementById('loader').classList.add('gone');setTimeout(()=>{try{document.getElementById('loader').style.display='none'}catch(e){}},700)},2200);
 });
