@@ -432,9 +432,11 @@ footer{border-top:1px solid rgba(255,255,255,.08);padding:3.5rem 2.5vw 2rem;disp
 .faq-cat-lbl{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.3);margin:2.5rem 0 .6rem}
 
 /* INSTAGRAM FEED */
-.ig-sec{padding:5rem 2.5vw;border-top:1px solid rgba(255,255,255,.08)}
-.ig-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(255,255,255,.07);margin-top:2.5rem}
-.ig-item{position:relative;aspect-ratio:1;overflow:hidden;cursor:pointer;background:#000}
+.ig-sec{padding:5rem 2.5vw;border-top:1px solid rgba(255,255,255,.08);overflow:hidden}
+.ig-grid{display:flex;width:max-content;margin-top:2.5rem;animation:igmarq 40s linear infinite}
+.ig-grid:hover{animation-play-state:paused}
+@keyframes igmarq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ig-item{position:relative;flex:0 0 auto;width:clamp(150px,20vw,240px);margin-right:6px;aspect-ratio:1;overflow:hidden;cursor:pointer;background:#000}
 .ig-item img{transition:transform .6s ease}
 .ig-item:hover img{transform:scale(1.08)}
 .ig-veil{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
@@ -1927,6 +1929,7 @@ document.querySelectorAll('.rv:not(.in)').forEach(function(el){ro.observe(el);})
 var parTick=false;
 function parScroll(){var y=window.scrollY;document.querySelectorAll('.par').forEach(function(el){var sp=parseFloat(el.dataset.par||'0.1');el.style.transform='translate3d(0,'+(y*sp).toFixed(1)+'px,0)';});parTick=false;}
 window.addEventListener('scroll',function(){if(!parTick){requestAnimationFrame(parScroll);parTick=true;}},{passive:true});
+(function(){var g=document.querySelector('.ig-grid');if(g&&!g.dataset.dup){g.dataset.dup='1';Array.prototype.slice.call(g.children).forEach(function(it){g.appendChild(it.cloneNode(true));});}})();
 var _sc=document.getElementById('shop-count');if(_sc&&typeof PRODUCTS!=='undefined')_sc.textContent=PRODUCTS.length+' Pieces — SS 2026';
 
 
