@@ -211,6 +211,22 @@ input,select{font-family:'Barlow',sans-serif}
 /* SIZE FINDER */
 .szfinder{background:#0c0c0c;border:1px solid rgba(255,255,255,.1);padding:1.4rem;margin-bottom:1.8rem}
 .szfinder.hl{animation:szHl 2.6s ease 1}
+.deliv{margin:1.7rem 0;padding:1.3rem 1.1rem;background:#0c0c0c;border:1px solid rgba(255,255,255,.1)}
+.deliv-h{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem}
+.deliv-track{display:flex;justify-content:space-between;position:relative}
+.deliv-track::before{content:'';position:absolute;top:15px;left:12%;right:12%;height:2px;background:rgba(255,255,255,.12)}
+.deliv-track::after{content:'';position:absolute;top:15px;left:12%;width:0;height:2px;background:#8cb8d9;transition:width 1.1s ease .3s}
+.deliv.go .deliv-track::after{width:26%}
+.deliv-step{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;flex:1;z-index:1;opacity:0;transform:translateY(8px)}
+.deliv.go .deliv-step{animation:dvin .5s ease forwards}
+.deliv.go .deliv-step:nth-child(1){animation-delay:.05s}.deliv.go .deliv-step:nth-child(2){animation-delay:.2s}.deliv.go .deliv-step:nth-child(3){animation-delay:.35s}.deliv.go .deliv-step:nth-child(4){animation-delay:.5s}
+@keyframes dvin{to{opacity:1;transform:translateY(0)}}
+.deliv-ico{width:32px;height:32px;border-radius:50%;background:#161616;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:.5rem}
+.deliv-step.done .deliv-ico{background:#8cb8d9;border-color:#8cb8d9}
+.deliv-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.deliv-date{font-size:10.5px;color:#fff;margin-top:.3rem}
+.deliv-step.done .deliv-date{color:#8cb8d9;font-weight:700}
+.deliv-note{font-size:10px;color:rgba(255,255,255,.35);margin-top:1.1rem;line-height:1.5}
 @keyframes szHl{0%,100%{box-shadow:0 0 0 0 rgba(140,184,217,0);border-color:rgba(255,255,255,.1)}25%,55%{box-shadow:0 0 24px 2px rgba(140,184,217,.5);border-color:rgba(140,184,217,.9)}}
 .szf-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
 .szf-sub{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1.1rem}
@@ -1132,6 +1148,17 @@ textarea.adm-inp{min-height:70px;resize:vertical}
       <button class="pd-add" onclick="addFromPD()"><span id="pd-add-txt">Add to Bag</span></button>
       <button class="pd-buy" onclick="buyNow()">Buy It Now</button>
 
+      <div class="deliv" id="deliv">
+        <p class="deliv-h">🚚 Estimated Delivery</p>
+        <div class="deliv-track">
+          <div class="deliv-step done"><span class="deliv-ico">📦</span><span class="deliv-lbl">Ordered</span><span class="deliv-date" id="dv-d0">Today</span></div>
+          <div class="deliv-step"><span class="deliv-ico">🏷️</span><span class="deliv-lbl">Dispatched</span><span class="deliv-date" id="dv-d1"></span></div>
+          <div class="deliv-step"><span class="deliv-ico">🛵</span><span class="deliv-lbl">In Transit</span><span class="deliv-date" id="dv-d2"></span></div>
+          <div class="deliv-step"><span class="deliv-ico">✅</span><span class="deliv-lbl">Delivered</span><span class="deliv-date" id="dv-d3"></span></div>
+        </div>
+        <p class="deliv-note">Order today for next-day dispatch. Dhaka: 1–2 days · Outside Dhaka: 2–4 days.</p>
+      </div>
+
       <p class="pd-desc" id="pd-desc"></p>
 
       <div class="pd-accordion">
@@ -1595,6 +1622,18 @@ function sortShop(mode){
 
 // ═══ PRODUCT PAGE ═══
 let pdSize=null, pdColor=null;
+function setDeliveryDates(){
+  var fmt=function(d){return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});};
+  var now=new Date();
+  var mk=function(n){var x=new Date(now);x.setDate(now.getDate()+n);return x;};
+  var set=function(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt;};
+  set('dv-d0','Today · '+fmt(now));
+  set('dv-d1',fmt(mk(1)));
+  set('dv-d2',fmt(mk(2)));
+  set('dv-d3','By '+fmt(mk(3)));
+  var dv=document.getElementById('deliv');
+  if(dv){dv.classList.remove('go');void dv.offsetWidth;dv.classList.add('go');}
+}
 function openProduct(id){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p)return;
@@ -1632,6 +1671,7 @@ function openProduct(id){
   const zw=document.querySelector('.pd-main-img');
   if(zw){zw.classList.remove('zoomed');document.getElementById('pd-img').style.transform='';}
   setTimeout(function(){var _szf=document.querySelector('#pg-product .szfinder');if(_szf){_szf.classList.remove('hl');void _szf.offsetWidth;_szf.classList.add('hl');}},650);
+  setTimeout(setDeliveryDates,450);
 
   go('product');
 }
