@@ -543,6 +543,82 @@ textarea.adm-inp{min-height:70px;resize:vertical}
 </style>
 </head>
 <body>
+
+<style id="winter-style">
+/* ===== WINTER CAMPAIGN ===== */
+#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:450}
+#wteaser{position:fixed;inset:0;z-index:7000;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:5vh 6vw;overflow:hidden;opacity:0;visibility:hidden;
+  background:radial-gradient(130% 90% at 50% -5%, #0d1a28 0%, #06090e 55%, #000 100%);
+  transition:opacity .9s ease,visibility .9s ease}
+#wteaser.show{opacity:1;visibility:visible}
+#wt-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+#wteaser .wt-inner{position:relative;z-index:2;max-width:920px;animation:wtUp 1s ease both}
+@keyframes wtUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.wt-eyebrow{font-family:'Space Mono',monospace;font-size:clamp(9px,1.3vw,13px);letter-spacing:.42em;
+  text-transform:uppercase;color:#8cb8d9;margin:0 0 1.5rem;display:flex;gap:.7rem;align-items:center;justify-content:center}
+.wt-eyebrow::before,.wt-eyebrow::after{content:"";height:1px;width:clamp(20px,5vw,40px)}
+.wt-eyebrow::before{background:linear-gradient(90deg,transparent,#8cb8d9)}
+.wt-eyebrow::after{background:linear-gradient(90deg,#8cb8d9,transparent)}
+.wt-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;text-transform:uppercase;line-height:.8;letter-spacing:-.01em;margin:0}
+.wt-title .l1{display:block;font-size:clamp(60px,15vw,186px);color:#fff;text-shadow:0 0 48px rgba(140,184,217,.4)}
+.wt-title .l2{display:block;font-size:clamp(28px,7.2vw,92px);color:transparent;-webkit-text-stroke:1.4px rgba(255,255,255,.65);letter-spacing:.05em}
+.wt-sub{font-family:'Barlow',sans-serif;font-weight:300;color:rgba(255,255,255,.74);font-size:clamp(14px,1.5vw,18px);margin:1.6rem auto 0;max-width:440px;line-height:1.6}
+.wt-cd{display:flex;gap:clamp(8px,2.2vw,30px);justify-content:center;align-items:flex-start;margin:2.4rem 0 2.3rem}
+.wt-cd .cell{min-width:clamp(52px,10vw,94px)}
+.wt-cd .num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(34px,6.4vw,74px);color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.wt-cd .unit{font-family:'Space Mono',monospace;font-size:clamp(8px,1.05vw,11px);letter-spacing:.26em;text-transform:uppercase;color:#8cb8d9;margin-top:.55rem}
+.wt-cd .sep{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(26px,4.6vw,56px);color:rgba(140,184,217,.38);line-height:1.1}
+.wt-actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.wt-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:14px;padding:.95rem 2rem;border:1px solid rgba(255,255,255,.28);background:transparent;color:#fff;cursor:pointer;transition:.25s;border-radius:2px;text-decoration:none;display:inline-block}
+.wt-btn.primary{background:#8cb8d9;color:#06090e;border-color:#8cb8d9}
+.wt-btn:hover{transform:translateY(-2px);border-color:#8cb8d9}
+.wt-btn.primary:hover{box-shadow:0 12px 32px rgba(140,184,217,.4)}
+.wt-close{position:absolute;top:16px;right:22px;z-index:3;background:none;border:none;color:rgba(255,255,255,.55);font-size:30px;cursor:pointer;line-height:1}
+.wt-close:hover{color:#fff}
+#wpill{position:fixed;left:16px;bottom:18px;z-index:460;display:flex;align-items:center;gap:.5rem;background:rgba(11,20,32,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(140,184,217,.4);color:#fff;padding:.52rem .9rem;border-radius:40px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 8px 24px rgba(0,0,0,.45);transition:.25s}
+#wpill:hover{border-color:#8cb8d9;transform:translateY(-2px)}
+#wpill .flk{color:#8cb8d9;font-size:13px;animation:wspin 6s linear infinite}
+@keyframes wspin{to{transform:rotate(360deg)}}
+#wpill b{color:#8cb8d9;font-weight:400}
+#winterSec{position:relative;overflow:hidden;background:radial-gradient(120% 130% at 82% -10%, rgba(140,184,217,.1), transparent 55%),#06090e;border-top:1px solid rgba(140,184,217,.14);border-bottom:1px solid rgba(140,184,217,.14);padding:clamp(60px,9vw,120px) 2.5vw;text-align:center}
+#winterSec .ws-in{position:relative;z-index:2}
+#ws-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:.8}
+#winterSec .ws-eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:#8cb8d9;margin:0 0 1.2rem}
+#winterSec .ws-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;text-transform:uppercase;line-height:.82;margin:0}
+#winterSec .ws-title .a{display:block;font-size:clamp(44px,9.5vw,128px);color:#fff}
+#winterSec .ws-title .b{display:block;font-size:clamp(22px,5.4vw,68px);color:transparent;-webkit-text-stroke:1.2px rgba(140,184,217,.6);letter-spacing:.06em}
+#winterSec .ws-sub{font-family:'Barlow',sans-serif;font-weight:300;color:rgba(255,255,255,.72);font-size:clamp(13px,1.4vw,17px);margin:1.4rem auto 0;max-width:430px}
+#winterSec .ws-cta{display:inline-block;margin-top:2rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:14px;padding:.9rem 2rem;background:#8cb8d9;color:#06090e;border-radius:2px;cursor:pointer}
+#winterSec .ws-cta:hover{box-shadow:0 12px 32px rgba(140,184,217,.35)}
+@media(max-width:600px){.wt-cd .sep{display:none}.wt-cd{gap:16px}}
+@media(prefers-reduced-motion:reduce){#snow,#wt-canvas,#ws-canvas,#wpill .flk{animation:none;display:none}}
+</style>
+<canvas id="snow"></canvas>
+<div id="wteaser" role="dialog" aria-label="Winter Collection teaser">
+  <canvas id="wt-canvas"></canvas>
+  <button class="wt-close" onclick="closeWinter()" aria-label="Close">&times;</button>
+  <div class="wt-inner">
+    <p class="wt-eyebrow">Owl Wear &middot; Winter 2026</p>
+    <h1 class="wt-title"><span class="l1">Winter</span><span class="l2">Collection</span></h1>
+    <p class="wt-sub">The cold season is coming. Heavyweight layers, built for the chill &mdash; dropping Nov 15.</p>
+    <div class="wt-cd">
+      <div class="cell"><div class="num" data-d>00</div><div class="unit">Days</div></div>
+      <div class="sep">:</div>
+      <div class="cell"><div class="num" data-h>00</div><div class="unit">Hrs</div></div>
+      <div class="sep">:</div>
+      <div class="cell"><div class="num" data-m>00</div><div class="unit">Min</div></div>
+      <div class="sep">:</div>
+      <div class="cell"><div class="num" data-s>00</div><div class="unit">Sec</div></div>
+    </div>
+    <div class="wt-actions">
+      <button class="wt-btn primary" onclick="closeWinter()">Explore The Site &rarr;</button>
+      <a class="wt-btn" onclick="winterNotify()">Notify Me &#10052;</a>
+    </div>
+  </div>
+</div>
+<div id="wpill" onclick="openWinter()" title="Winter Collection"><span class="flk">&#10052;</span> Winter Drop &middot; <b>Nov 15</b></div>
+
 <div id="loader">
   <img class="ld-owl" src="owl-mark.svg" alt="OWL WEAR">
   <div class="ld-word"><span>O</span><span>W</span><span>L</span>&nbsp;<span>W</span><span>E</span><span>A</span><span>R</span></div>
@@ -836,6 +912,25 @@ textarea.adm-inp{min-height:70px;resize:vertical}
     <div class="hero-copy">
       <h2 class="hero-copy-h">Wear Your<br>Wisdom</h2>
       <p class="hero-copy-sub">Discover trend-forward pieces designed to elevate your everyday look with effortless elegance.</p>
+    </div>
+  </section>
+
+<section id="winterSec">
+    <canvas id="ws-canvas"></canvas>
+    <div class="ws-in">
+      <p class="ws-eyebrow">// Coming Nov 15 &middot; 2026</p>
+      <h2 class="ws-title"><span class="a">Winter Is Coming</span><span class="b">Collection 2026</span></h2>
+      <p class="ws-sub">Heavyweight hoods, layered fits and cold-season staples. Be first in line when it drops.</p>
+      <div class="wt-cd" style="margin-bottom:0">
+        <div class="cell"><div class="num" data-d>00</div><div class="unit">Days</div></div>
+        <div class="sep">:</div>
+        <div class="cell"><div class="num" data-h>00</div><div class="unit">Hrs</div></div>
+        <div class="sep">:</div>
+        <div class="cell"><div class="num" data-m>00</div><div class="unit">Min</div></div>
+        <div class="sep">:</div>
+        <div class="cell"><div class="num" data-s>00</div><div class="unit">Sec</div></div>
+      </div>
+      <div><span class="ws-cta" onclick="winterNotify()">Notify Me On WhatsApp &#10052;</span></div>
     </div>
   </section>
 
@@ -2353,6 +2448,75 @@ fetch('content/data.json',{cache:'no-store'}).then(function(r){return r.ok?r.jso
 window.addEventListener('load',()=>{
   setTimeout(()=>{document.getElementById('loader').classList.add('gone');setTimeout(()=>{try{document.getElementById('loader').style.display='none'}catch(e){}},700)},2200);
 });
+</script>
+
+<script>
+/* ===== WINTER CAMPAIGN JS ===== */
+(function(){
+  var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TARGET = new Date(2026,10,15,20,0,0); // Nov 15 2026 20:00 local (month is 0-indexed)
+  function pad(n){return (n<10?'0':'')+n;}
+  function tick(){
+    var diff = TARGET - new Date(); if(diff<0) diff=0;
+    var d=Math.floor(diff/864e5), h=Math.floor(diff%864e5/36e5), m=Math.floor(diff%36e5/6e4), s=Math.floor(diff%6e4/1e3);
+    var v={d:pad(d),h:pad(h),m:pad(m),s:pad(s)};
+    document.querySelectorAll('.wt-cd').forEach(function(cd){
+      ['d','h','m','s'].forEach(function(k){var e=cd.querySelector('[data-'+k+']'); if(e) e.textContent=v[k];});
+    });
+  }
+  tick(); setInterval(tick,1000);
+
+  // Snowfall
+  function snow(canvas, density){
+    if(!canvas || RM) return;
+    var ctx=canvas.getContext('2d'), flakes=[], W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+    function size(){
+      var r=canvas.getBoundingClientRect(); W=r.width; H=r.height;
+      canvas.width=W*DPR; canvas.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+      var n=Math.round(W*H/density);
+      flakes=[]; for(var i=0;i<n;i++) flakes.push(mk());
+    }
+    function mk(){return {x:Math.random()*W, y:Math.random()*H, r:Math.random()*2.1+0.5,
+      sp:Math.random()*0.6+0.25, dr:Math.random()*0.6-0.3, o:Math.random()*0.5+0.25,
+      ph:Math.random()*6.28};}
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for(var i=0;i<flakes.length;i++){var f=flakes[i];
+        f.y+=f.sp; f.ph+=0.01; f.x+=f.dr+Math.sin(f.ph)*0.3;
+        if(f.y>H+4){f.y=-4; f.x=Math.random()*W;}
+        if(f.x>W+4)f.x=-4; else if(f.x<-4)f.x=W+4;
+        ctx.globalAlpha=f.o; ctx.fillStyle='#eaf3fb';
+        ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.28); ctx.fill();
+      }
+      ctx.globalAlpha=1; requestAnimationFrame(draw);
+    }
+    size(); draw(); window.addEventListener('resize',size,{passive:true});
+  }
+  window.addEventListener('DOMContentLoaded',function(){
+    snow(document.getElementById('snow'), 10000);
+    snow(document.getElementById('ws-canvas'), 7000);
+  });
+
+  // Teaser controls
+  window.openWinter=function(){var t=document.getElementById('wteaser'); t.style.display='flex';
+    requestAnimationFrame(function(){t.classList.add('show');}); snow(document.getElementById('wt-canvas'),9000);};
+  window.closeWinter=function(){var t=document.getElementById('wteaser'); t.classList.remove('show');
+    try{sessionStorage.setItem('owl_winter_seen','1');}catch(e){}
+    setTimeout(function(){t.style.display='none';},900);};
+  window.winterNotify=function(){window.open('https://wa.me/8801410053188?text='+
+    encodeURIComponent('Hi OWL WEAR! ❄️ Please notify me when the Winter Collection drops.'),'_blank');};
+
+  // Show once per session, after the intro loader finishes
+  window.addEventListener('load',function(){
+    var seen; try{seen=sessionStorage.getItem('owl_winter_seen');}catch(e){}
+    if(seen) return;
+    setTimeout(function(){
+      var t=document.getElementById('wteaser'); if(!t) return;
+      t.style.display='flex'; requestAnimationFrame(function(){t.classList.add('show');});
+      snow(document.getElementById('wt-canvas'),9000);
+    },2980);
+  });
+})();
 </script>
 
 </body></html>
