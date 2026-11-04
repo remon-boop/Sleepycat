@@ -544,6 +544,67 @@ textarea.adm-inp{min-height:70px;resize:vertical}
 </head>
 <body>
 
+<style id="tryon-style">
+.pd-tryon{width:100%;margin-top:10px;background:transparent;border:1px solid rgba(140,184,217,.5);color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  font-size:14px;padding:.9rem 1rem;cursor:pointer;border-radius:2px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.pd-tryon:hover{background:rgba(140,184,217,.12);border-color:#8cb8d9}
+.pd-tryon .ttry-beta{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;color:#06090e;background:#8cb8d9;padding:2px 6px;border-radius:3px}
+#tryon{position:fixed;inset:0;z-index:9200;display:none;flex-direction:column;background:#05070b}
+#tryon.open{display:flex}
+.to-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;z-index:3;border-bottom:1px solid rgba(255,255,255,.08)}
+.to-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:18px;color:#fff;display:flex;align-items:center}
+.to-title b{color:#8cb8d9;font-weight:900}
+.to-beta{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;border:1px solid #8cb8d9;color:#8cb8d9;padding:2px 6px;border-radius:3px;margin-left:10px}
+.to-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:30px;line-height:1;cursor:pointer}
+.to-close:hover{color:#fff}
+.to-stage{position:relative;flex:1;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
+#to-video{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#to-canvas{max-width:100%;max-height:100%;display:block}
+.to-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem;color:#fff;background:rgba(5,7,11,.9);z-index:2}
+.to-hint.hide{display:none}
+.to-spin{width:42px;height:42px;border:3px solid rgba(140,184,217,.25);border-top-color:#8cb8d9;border-radius:50%;animation:tospin 1s linear infinite}
+@keyframes tospin{to{transform:rotate(360deg)}}
+.to-hint p{font-family:'Barlow',sans-serif;max-width:360px;line-height:1.5;color:rgba(255,255,255,.85)}
+.to-hint .to-retry{margin-top:.4rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;background:#8cb8d9;color:#06090e;border:none;padding:.8rem 1.8rem;border-radius:2px;cursor:pointer}
+.to-tip{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;z-index:2;pointer-events:none}
+.to-bottom{padding:12px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;align-items:center;background:#05070b;border-top:1px solid rgba(255,255,255,.08)}
+.to-thumbs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.to-thumb{width:52px;height:52px;border:2px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;cursor:pointer;background:#0d141c;padding:0}
+.to-thumb img{width:100%;height:100%;object-fit:contain}
+.to-thumb.on{border-color:#8cb8d9}
+.to-actions{display:flex;gap:10px}
+.to-abtn{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:14px;padding:.8rem 1.6rem;border-radius:2px;cursor:pointer;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+.to-abtn.primary{background:#8cb8d9;color:#06090e;border-color:#8cb8d9}
+.to-abtn:hover{transform:translateY(-1px)}
+.to-abtn:disabled{opacity:.4;cursor:default;transform:none}
+#to-flip{font-size:18px;padding:.7rem .9rem}
+</style>
+<div id="tryon" role="dialog" aria-label="AI Try-On">
+  <div class="to-top">
+    <span class="to-title">AI&nbsp;<b>Try&#8209;On</b><span class="to-beta">BETA</span></span>
+    <button class="to-close" onclick="closeTryOn()" aria-label="Close">&times;</button>
+  </div>
+  <div class="to-stage">
+    <video id="to-video" playsinline muted autoplay></video>
+    <canvas id="to-canvas"></canvas>
+    <div class="to-hint" id="to-hint">
+      <div class="to-spin" id="to-spin"></div>
+      <p id="to-msg">Starting camera&hellip; please allow camera access.</p>
+      <button class="to-retry" id="to-retry" style="display:none" onclick="startTryOnCam()">Enable Camera</button>
+    </div>
+    <div class="to-tip">Stand back so your shoulders are visible &middot; good light helps</div>
+  </div>
+  <div class="to-bottom">
+    <div class="to-thumbs" id="to-thumbs"></div>
+    <div class="to-actions">
+      <button class="to-abtn" id="to-flip" onclick="flipTryOnCam()" title="Flip camera">&#128260;</button>
+      <button class="to-abtn primary" id="to-snap" onclick="snapTryOn()" disabled>&#128247; Snap Photo</button>
+    </div>
+  </div>
+</div>
+
+
 <style id="winter-style">
 /* ===== WINTER CAMPAIGN ===== */
 #snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:450}
@@ -1256,6 +1317,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
 
       <button class="pd-add" onclick="addFromPD()"><span id="pd-add-txt">Add to Bag</span></button>
       <button class="pd-buy" onclick="buyNow()">Buy It Now</button>
+      <button class="pd-tryon" id="pd-tryon" onclick="openTryOn(currentProduct&&currentProduct.id)">&#128247; Try It On &mdash; See It On You <span class="ttry-beta">BETA</span></button>
 
       <div class="deliv" id="deliv">
         <p class="deliv-h">🚚 Estimated Delivery</p>
@@ -1747,6 +1809,7 @@ function openProduct(id){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p)return;
   currentProduct=p;
+  try{var _tb=document.getElementById('pd-tryon');if(_tb)_tb.style.display=(window.TRYON&&window.TRYON[p.id])?'':'none';}catch(e){}
   pdSize=null; pdColor=p.colors[0].name;
 
   document.getElementById('pd-thumbs').innerHTML=p.imgs.map((k,i)=>
@@ -2516,6 +2579,155 @@ window.addEventListener('load',()=>{
       snow(document.getElementById('wt-canvas'),9000);
     },2980);
   });
+})();
+</script>
+
+<script>
+/* ===== AI TRY-ON (BETA) ===== */
+window.TRYON = {
+  "lightning-hoodie": {img:"tryon_lightning-hoodie.png", w:219, h:286, shoulderFrac:0.721, shoulderY:0.033, name:"Night Spine Hoodie"},
+  "katakana-black":   {img:"tryon_katakana-black.png",   w:607, h:848, shoulderFrac:0.695, shoulderY:0.030, name:"Shadow Ninja Tee"},
+  "box-fit-tee":      {img:"tryon_box-fit-tee.png",      w:363, h:463, shoulderFrac:0.697, shoulderY:0.033, name:"Box Fit T-Shirt"}
+};
+(function(){
+  var landmarker=null, loading=false, stream=null, raf=null, running=false;
+  var facing='user', curId=null, garImg=new Image(), garReady=false;
+  var video,canvas,ctx,hint,msg,spin,retry,snapBtn,thumbs;
+  function el(id){return document.getElementById(id);}
+  function ready(){video=el('to-video');canvas=el('to-canvas');ctx=canvas.getContext('2d');
+    hint=el('to-hint');msg=el('to-msg');spin=el('to-spin');retry=el('to-retry');snapBtn=el('to-snap');thumbs=el('to-thumbs');}
+  function showHint(text,showRetry){hint.classList.remove('hide');msg.innerHTML=text;
+    spin.style.display=showRetry?'none':'';retry.style.display=showRetry?'':'none';}
+  function hideHint(){hint.classList.add('hide');}
+
+  function buildThumbs(){
+    thumbs.innerHTML='';
+    Object.keys(window.TRYON).forEach(function(id){
+      var g=window.TRYON[id];
+      var b=document.createElement('button'); b.className='to-thumb'+(id===curId?' on':'');
+      b.title=g.name; b.innerHTML='<img src="'+g.img+'" alt="'+g.name+'">';
+      b.onclick=function(){setGarment(id);};
+      thumbs.appendChild(b);
+    });
+  }
+  function setGarment(id){
+    if(!window.TRYON[id]) id=Object.keys(window.TRYON)[0];
+    curId=id; garReady=false; garImg=new Image();
+    garImg.onload=function(){garReady=true;};
+    garImg.src=window.TRYON[id].img;
+    buildThumbs();
+  }
+
+  window.openTryOn=function(id){
+    ready();
+    el('tryon').classList.add('open');
+    document.body.style.overflow='hidden';
+    setGarment((id&&window.TRYON[id])?id:Object.keys(window.TRYON)[0]);
+    startTryOnCam();
+    if(window.gtag)gtag('event','tryon_open',{item_id:id||''});
+  };
+  window.closeTryOn=function(){
+    running=false; if(raf)cancelAnimationFrame(raf);
+    if(stream){stream.getTracks().forEach(function(t){t.stop();});stream=null;}
+    el('tryon').classList.remove('open'); document.body.style.overflow='';
+  };
+  window.flipTryOnCam=function(){facing=(facing==='user')?'environment':'user';startTryOnCam();};
+
+  async function ensureModel(){
+    if(landmarker) return landmarker;
+    if(loading){ while(loading){await new Promise(r=>setTimeout(r,120));} return landmarker; }
+    loading=true;
+    showHint('Loading AI model&hellip;',false);
+    var vision=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');
+    var fileset=await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    landmarker=await vision.PoseLandmarker.createFromOptions(fileset,{
+      baseOptions:{modelAssetPath:'pose_landmarker_lite.task'},
+      runningMode:'VIDEO', numPoses:1
+    });
+    loading=false; return landmarker;
+  }
+
+  window.startTryOnCam=async function(){
+    try{
+      showHint('Starting camera&hellip; please allow access.',false);
+      if(stream){stream.getTracks().forEach(function(t){t.stop();});}
+      if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+        showHint('Your browser does not support camera access. Try Chrome or Safari.',false);return;}
+      stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:720}},audio:false});
+      video.srcObject=stream; await video.play();
+      await ensureModel();
+      hideHint(); snapBtn.disabled=false; running=true;
+      if(raf)cancelAnimationFrame(raf); loop();
+    }catch(err){
+      var m='Could not start the camera.';
+      if(err&&(err.name==='NotAllowedError'||err.name==='SecurityError'))
+        m='Camera permission was blocked. Allow camera access in your browser settings, then tap Enable Camera.';
+      else if(err&&err.name==='NotFoundError') m='No camera found on this device.';
+      showHint(m,true);
+    }
+  };
+
+  function loop(){
+    if(!running) return;
+    if(video.readyState>=2 && video.videoWidth){
+      if(canvas.width!==video.videoWidth){canvas.width=video.videoWidth;canvas.height=video.videoHeight;}
+      var res=null;
+      try{ res=landmarker.detectForVideo(video, performance.now()); }catch(e){}
+      draw(res);
+    }
+    raf=requestAnimationFrame(loop);
+  }
+
+  function draw(res){
+    var W=canvas.width,H=canvas.height;
+    // mirrored video (selfie)
+    ctx.save(); ctx.setTransform(-1,0,0,1,W,0); ctx.drawImage(video,0,0,W,H); ctx.restore();
+    ctx.setTransform(1,0,0,1,0,0);
+    if(!garReady||!res||!res.landmarks||!res.landmarks.length) return;
+    var lm=res.landmarks[0];
+    var ls=lm[11], rs=lm[12], lh=lm[23], rh=lm[24];
+    if(!ls||!rs) return;
+    if((ls.visibility!==undefined&&ls.visibility<0.4)&&(rs.visibility!==undefined&&rs.visibility<0.4)) return;
+    // mirror x: displayed x = (1-x)*W
+    var lsx=(1-ls.x)*W, lsy=ls.y*H, rsx=(1-rs.x)*W, rsy=rs.y*H;
+    var midX=(lsx+rsx)/2, midY=(lsy+rsy)/2;
+    var dist=Math.hypot(rsx-lsx, rsy-lsy);
+    var angle=Math.atan2(rsy-lsy, rsx-lsx);
+    var g=window.TRYON[curId];
+    var widen=1.18;
+    var gw=dist*widen/g.shoulderFrac;
+    var gh=gw*(g.h/g.w);
+    // nudge down a touch so collar sits on neck/shoulders
+    var dy=gh*g.shoulderY - gh*0.02;
+    ctx.save();
+    ctx.translate(midX,midY); ctx.rotate(angle);
+    ctx.globalAlpha=0.97;
+    ctx.drawImage(garImg, -gw/2, -dy, gw, gh);
+    ctx.restore();
+    ctx.globalAlpha=1;
+  }
+
+  window.snapTryOn=function(){
+    if(!canvas.width) return;
+    var out=document.createElement('canvas'); out.width=canvas.width; out.height=canvas.height;
+    var o=out.getContext('2d'); o.drawImage(canvas,0,0);
+    // watermark
+    o.font='bold '+Math.round(out.width*0.03)+'px Barlow, sans-serif';
+    o.fillStyle='rgba(255,255,255,.85)'; o.textAlign='right';
+    o.fillText('OWL WEAR', out.width-16, out.height-16);
+    out.toBlob(function(blob){
+      if(!blob) return;
+      var file=new File([blob],'owlwear-tryon.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'OWL WEAR Try-On',text:'My OWL WEAR try-on ❄'}).catch(function(){});
+      }else{
+        var url=URL.createObjectURL(blob); var a=document.createElement('a');
+        a.href=url; a.download='owlwear-tryon.png'; document.body.appendChild(a); a.click();
+        setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);
+      }
+    },'image/png');
+    if(window.gtag)gtag('event','tryon_snap',{item_id:curId||''});
+  };
 })();
 </script>
 
