@@ -601,7 +601,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
   <div class="wt-inner">
     <p class="wt-eyebrow">Owl Wear &middot; Winter 2026</p>
     <h1 class="wt-title"><span class="l1">Winter</span><span class="l2">Collection</span></h1>
-    <p class="wt-sub">The cold season is coming. Heavyweight layers, built for the chill &mdash; dropping Nov 15.</p>
+    <p class="wt-sub">The cold season is coming. Heavyweight layers, built for the chill &mdash; dropping Nov 25.</p>
     <div class="wt-cd">
       <div class="cell"><div class="num" data-d>00</div><div class="unit">Days</div></div>
       <div class="sep">:</div>
@@ -617,7 +617,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
     </div>
   </div>
 </div>
-<div id="wpill" onclick="openWinter()" title="Winter Collection"><span class="flk">&#10052;</span> Winter Drop &middot; <b>Nov 15</b></div>
+<div id="wpill" onclick="openWinter()" title="Winter Collection"><span class="flk">&#10052;</span> Winter Drop &middot; <b>Nov 25</b></div>
 
 <div id="loader">
   <img class="ld-owl" src="owl-mark.svg" alt="OWL WEAR">
@@ -918,7 +918,7 @@ textarea.adm-inp{min-height:70px;resize:vertical}
 <section id="winterSec">
     <canvas id="ws-canvas"></canvas>
     <div class="ws-in">
-      <p class="ws-eyebrow">// Coming Nov 15 &middot; 2026</p>
+      <p class="ws-eyebrow">// Coming Nov 25 &middot; 2026</p>
       <h2 class="ws-title"><span class="a">Winter Is Coming</span><span class="b">Collection 2026</span></h2>
       <p class="ws-sub">Heavyweight hoods, layered fits and cold-season staples. Be first in line when it drops.</p>
       <div class="wt-cd" style="margin-bottom:0">
@@ -2454,7 +2454,7 @@ window.addEventListener('load',()=>{
 /* ===== WINTER CAMPAIGN JS ===== */
 (function(){
   var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var TARGET = new Date(2026,10,15,20,0,0); // Nov 15 2026 20:00 local (month is 0-indexed)
+  var TARGET = new Date(2026,10,25,20,0,0); // Nov 25 2026 20:00 local (month is 0-indexed)
   function pad(n){return (n<10?'0':'')+n;}
   function tick(){
     var diff = TARGET - new Date(); if(diff<0) diff=0;
